@@ -47,7 +47,21 @@ const App = () => {
     const existingPerson = persons.find((person) => person.name === newName);
   
     if (existingPerson) {
-      alert(`${newName} is already added to phonebook`);
+      const confirmUpdate = window.confirm(
+        `${newName} is already added to the phonebook, replace the old number with a new one?`
+      );
+  
+      if (confirmUpdate) {
+        try {
+          const updatedPerson = { ...existingPerson, phoneNumber: newPhoneNumber };
+          await personData.update(existingPerson.id,updatedPerson);
+          setNewName('');
+          setNewPhoneNumber('');
+          window.location.reload();
+        } catch (error) {
+          console.log(error);
+        }
+      }
     } else {
       const newPerson = { name: newName, phoneNumber: newPhoneNumber };
       try {

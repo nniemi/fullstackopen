@@ -1,5 +1,4 @@
 import React from 'react';
-import axios from 'axios';
 import personData from './src/services/personData';
 
 const Persons = ({ filteredPersons }) => {
