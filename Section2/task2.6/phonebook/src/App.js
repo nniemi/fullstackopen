@@ -12,6 +12,7 @@ const App = () => {
     const fetchData = async () => {
       try {
         const response = await personData.getAll()
+        console.log(response.data);
         setPersons(response.data);
       } catch (error) {
         console.log(error);
@@ -50,7 +51,7 @@ const App = () => {
     } else {
       const newPerson = { name: newName, phoneNumber: newPhoneNumber };
       try {
-        const response = await personData(newPerson)
+        const response = await personData.create(newPerson)
         setPersons([...persons, response.data]);
         setNewName('');
         setNewPhoneNumber('');
