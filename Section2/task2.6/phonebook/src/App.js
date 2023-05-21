@@ -40,7 +40,7 @@ const App = () => {
     setSearchTerm(value);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
   
     const existingPerson = persons.find((person) => person.name === newName);
@@ -49,9 +49,14 @@ const App = () => {
       alert(`${newName} is already added to phonebook`);
     } else {
       const newPerson = { name: newName, phoneNumber: newPhoneNumber };
-      setPersons([...persons, newPerson]);
-      setNewName('');
-      setNewPhoneNumber('')
+      try {
+        const response = await axios.post('http://localhost:3001/persons', newPerson);
+        setPersons([...persons, response.data]);
+        setNewName('');
+        setNewPhoneNumber('');
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
