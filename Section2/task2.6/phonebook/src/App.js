@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import Filter from './Filter'
 import PersonForm from './PersonForm'
 import Persons from './Persons'
-import axios from 'axios';
+import personData from './src/services/personData';
 
 
 const App = () => {
@@ -11,7 +11,7 @@ const App = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/persons');
+        const response = await personData.getAll()
         setPersons(response.data);
       } catch (error) {
         console.log(error);
@@ -50,7 +50,7 @@ const App = () => {
     } else {
       const newPerson = { name: newName, phoneNumber: newPhoneNumber };
       try {
-        const response = await axios.post('http://localhost:3001/persons', newPerson);
+        const response = await personData(newPerson)
         setPersons([...persons, response.data]);
         setNewName('');
         setNewPhoneNumber('');
