@@ -1,16 +1,16 @@
 import React from 'react';
 import axios from 'axios';
+import personData from './src/services/personData';
 
 const Persons = ({ filteredPersons }) => {
 
   const handleDelete = async (id) => {
-    console.log(filteredPersons)
     const deletedPerson = filteredPersons.find(person => person.id === id);
     const confirmDelete = window.confirm(`Delete ${deletedPerson.name}?`)
     if(confirmDelete) {
       try {
         
-        await axios.delete(`http://localhost:3001/persons/${id}`);
+        await personData.deletePerson(id)
         window.location.reload();
       } catch (error) {
         console.log(error);
