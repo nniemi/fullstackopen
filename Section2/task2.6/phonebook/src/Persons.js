@@ -2,7 +2,6 @@ import React from 'react';
 import App from './App';
 
 const Persons = ({ filteredPersons, handleDelete }) => {
-  console.log(filteredPersons)
   return (
     <div>
       {filteredPersons.map((person) => (

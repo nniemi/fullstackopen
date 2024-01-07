@@ -14,7 +14,6 @@ const App = () => {
     const fetchData = async () => {
       try {
         const response = await personData.getAll()
-        console.log(response.data);
         setPersons(response.data);
       } catch (error) {
         console.log(error);
@@ -66,7 +65,6 @@ const App = () => {
               setNotification(null);
             }, 3000);
           }).catch(error => {
-            console.log("broken")
             setNotification({message: `${existingPerson.name} has been deleted from the server`, color: "red"});
             setTimeout(() => setNotification(null), 3000);
           });
@@ -74,19 +72,18 @@ const App = () => {
       }
     } else {
       const newPerson = { name: newName, phoneNumber: newPhoneNumber };
-      try {
-        const response = await personData.create(newPerson)
-        setPersons([...persons, response.data]);
-        setNewName('');
-        setNewPhoneNumber('');
-        setNotification({message: `Added ${newPerson.name}`, color: "green"});
-        setTimeout(() => {
-          setNotification(null);
-        }, 3000);
-      } catch (error) {
-        setNotification({message: error.response.data.error, color: "red"});
-        setTimeout(() => setNotification(null), 3000);
-      }
+        const response = await personData.create(newPerson).then(x => {
+          setPersons([...persons, response.data]);
+          setNewName('');
+          setNewPhoneNumber('');
+          setNotification({message: `Added ${newPerson.name}`, color: "green"});
+          setTimeout(() => {
+            setNotification(null);
+          }, 3000);
+        }).catch(error => {
+          setNotification({message: "Error in adding a new person", color: "red"});
+          setTimeout(() => setNotification(null), 3000);
+        })
     }
   };
   const filteredPersons = persons.filter((person) =>
@@ -96,19 +93,16 @@ const App = () => {
     const deletedPerson = filteredPersons.find(person => person.id === id);
     const confirmDelete = window.confirm(`Delete ${deletedPerson.name}?`)
     if(confirmDelete) {
-      try {
-        
-        await personData.deletePerson(id)
-        setNotification({message: `${deletedPerson.name} deleted.`, color: "green"});
-        setTimeout(() => {
-          window.location.reload();
-          setNotification(null);
-        }, 3000);
-      } catch (error) {
-        setNotification({message: error.response.data.error, color: "red"});
-        setTimeout(() => setNotification(null), 3000);
-      }
-
+        await personData.deletePerson(id).then(x => {
+          setNotification({message: `${deletedPerson.name} deleted.`, color: "green"});
+          setTimeout(() => {
+            window.location.reload();
+            setNotification(null);
+          }, 3000);
+        }).catch(error => {
+          setNotification({message: error.response.data.error, color: "red"});
+          setTimeout(() => setNotification(null), 3000);
+        })
     }
 
   };
