@@ -3,6 +3,7 @@ import Filter from './Filter'
 import PersonForm from './PersonForm'
 import Persons from './Persons'
 import personData from './src/services/personData';
+import './App.css';
 
 
 const App = () => {
@@ -25,6 +26,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newPhoneNumber, setNewPhoneNumber] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleChange = (event) => {
     const { value } = event.target;
@@ -57,7 +59,12 @@ const App = () => {
           await personData.update(existingPerson.id,updatedPerson);
           setNewName('');
           setNewPhoneNumber('');
-          window.location.reload();
+
+          setSuccessMessage(`Updated ${existingPerson.name}'s phone number.`);
+          setTimeout(() => {
+            window.location.reload();
+            setSuccessMessage('');
+          }, 3000);
         } catch (error) {
           console.log(error);
         }
@@ -69,21 +76,44 @@ const App = () => {
         setPersons([...persons, response.data]);
         setNewName('');
         setNewPhoneNumber('');
+        setSuccessMessage(`Added ${newPerson.name}`);
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 3000);
       } catch (error) {
         console.log(error);
       }
     }
   };
-
+  console.log(persons)
   const filteredPersons = persons.filter((person) =>
   person.name.toLowerCase().includes(searchTerm.toLowerCase())
 );
+  const handleDelete = async (id) => {
+    const deletedPerson = filteredPersons.find(person => person.id === id);
+    const confirmDelete = window.confirm(`Delete ${deletedPerson.name}?`)
+    if(confirmDelete) {
+      try {
+        
+        await personData.deletePerson(id)
+        setSuccessMessage(`${deletedPerson.name} deleted.`);
+        setTimeout(() => {
+          window.location.reload();
+          setSuccessMessage('');
+        }, 3000);
+      } catch (error) {
+        console.log(error);
+      }
 
+    }
+
+  };
 
 
   return (
     <div>
       <h2>Phonebook</h2>
+      {successMessage && <div className="success-message">{successMessage}</div>}
       <Filter searchTerm={searchTerm} handleSearchChange={handleSearchChange} />
       <h2>Add a new</h2>
       <PersonForm
@@ -94,7 +124,7 @@ const App = () => {
         handleSubmit={handleSubmit}
       />
       <h2>Numbers</h2>
-      <Persons filteredPersons={filteredPersons} />
+      <Persons filteredPersons={filteredPersons} handleDelete={handleDelete} />
     </div>
   )
 

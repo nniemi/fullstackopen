@@ -1,23 +1,8 @@
 import React from 'react';
-import personData from './src/services/personData';
+import App from './App';
 
-const Persons = ({ filteredPersons }) => {
-
-  const handleDelete = async (id) => {
-    const deletedPerson = filteredPersons.find(person => person.id === id);
-    const confirmDelete = window.confirm(`Delete ${deletedPerson.name}?`)
-    if(confirmDelete) {
-      try {
-        
-        await personData.deletePerson(id)
-        window.location.reload();
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-
-  };
+const Persons = ({ filteredPersons, handleDelete }) => {
+  console.log(filteredPersons)
   return (
     <div>
       {filteredPersons.map((person) => (
