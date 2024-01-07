@@ -11,11 +11,11 @@ const create = newObject => {
 
 
 const deletePerson = id => {
-    return axios.delete(`http://localhost:3001/persons/${id}`);
+    return axios.delete(`${baseUrl}/${id}`);
 }
 
 const update = (id,updatedPerson) => {
-    return axios.put(`http://localhost:3001/persons/${id}`, updatedPerson);
+    return axios.put(`${baseUrl}/${id}`, updatedPerson);
 }
 
 export default { 

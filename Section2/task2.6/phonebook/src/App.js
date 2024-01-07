@@ -3,6 +3,7 @@ import Filter from './Filter'
 import PersonForm from './PersonForm'
 import Persons from './Persons'
 import personData from './src/services/personData';
+import Notification from './Notification';
 import './App.css';
 
 
@@ -26,7 +27,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newPhoneNumber, setNewPhoneNumber] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [notification, setNotification] = useState(null);
 
   const handleChange = (event) => {
     const { value } = event.target;
@@ -54,20 +55,22 @@ const App = () => {
       );
   
       if (confirmUpdate) {
-        try {
           const updatedPerson = { ...existingPerson, phoneNumber: newPhoneNumber };
-          await personData.update(existingPerson.id,updatedPerson);
-          setNewName('');
-          setNewPhoneNumber('');
+          await personData.update(existingPerson.id,updatedPerson).then(x => {
+            setNewName('');
+            setNewPhoneNumber('');
+  
+            setNotification({message: `Updated ${existingPerson.name}'s phone number.`, color: "green"});
+            setTimeout(() => {
+              window.location.reload();
+              setNotification(null);
+            }, 3000);
+          }).catch(error => {
+            console.log("broken")
+            setNotification({message: `${existingPerson.name} has been deleted from the server`, color: "red"});
+            setTimeout(() => setNotification(null), 3000);
+          });
 
-          setSuccessMessage(`Updated ${existingPerson.name}'s phone number.`);
-          setTimeout(() => {
-            window.location.reload();
-            setSuccessMessage('');
-          }, 3000);
-        } catch (error) {
-          console.log(error);
-        }
       }
     } else {
       const newPerson = { name: newName, phoneNumber: newPhoneNumber };
@@ -76,16 +79,16 @@ const App = () => {
         setPersons([...persons, response.data]);
         setNewName('');
         setNewPhoneNumber('');
-        setSuccessMessage(`Added ${newPerson.name}`);
+        setNotification({message: `Added ${newPerson.name}`, color: "green"});
         setTimeout(() => {
-          setSuccessMessage('');
+          setNotification(null);
         }, 3000);
       } catch (error) {
-        console.log(error);
+        setNotification({message: error.response.data.error, color: "red"});
+        setTimeout(() => setNotification(null), 3000);
       }
     }
   };
-  console.log(persons)
   const filteredPersons = persons.filter((person) =>
   person.name.toLowerCase().includes(searchTerm.toLowerCase())
 );
@@ -96,13 +99,14 @@ const App = () => {
       try {
         
         await personData.deletePerson(id)
-        setSuccessMessage(`${deletedPerson.name} deleted.`);
+        setNotification({message: `${deletedPerson.name} deleted.`, color: "green"});
         setTimeout(() => {
           window.location.reload();
-          setSuccessMessage('');
+          setNotification(null);
         }, 3000);
       } catch (error) {
-        console.log(error);
+        setNotification({message: error.response.data.error, color: "red"});
+        setTimeout(() => setNotification(null), 3000);
       }
 
     }
@@ -113,7 +117,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      {successMessage && <div className="success-message">{successMessage}</div>}
+      <Notification notification={notification}/>
       <Filter searchTerm={searchTerm} handleSearchChange={handleSearchChange} />
       <h2>Add a new</h2>
       <PersonForm
